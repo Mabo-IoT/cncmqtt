@@ -96,58 +96,36 @@ class DatabaseAdapter:
 if __name__ == "__main__":
     db = DatabaseAdapter()
     db.oraconnect()
-    # jsonobj = {"Cncld":"1",
-    #          "PingStr":"MDCisliving",
-    #          "RunStatus":"0",
-    #          "PoweronStatus":"0",
-    #          "Alarm":"报警信息",
-    #          "Time":"2020-02-19 16:00:14",
-    #          "SpindleTemp":23.567,
-    #          "EnvTemp":23.678,
-    #          "CutfluTemp":23.789,
-    #          "SliderTemp":23.891,
-    #          "Coordinate":{"X":12.123,"Y":23.234,"Z":34.345}
-    #         }
-    # sqlstr = """
-    #         insert into BASIC_MACHINE (cncid, pingstr, runstatus, poweronstatus, 
-    #                                    alarm, time, spindletemp, envtemp, 
-    #                                    cutflutemp, slidertemp, coordinate)
-    #         values (:cncid, :pingstr, :runstatus, 
-    #                 :poweronstatus, :alarm, to_date(:time, 'YYYY-MM-DD HH24:MI:SS'), 
-    #                 :spindletemp, :envtemp, :cutflutemp, :slidertemp, :coordinate)
-    #         """
-    # parameters = {'cncid':jsonobj['Cncld'], 'pingstr':jsonobj['PingStr'], 
-    #                       'runstatus':jsonobj['RunStatus'], 'poweronstatus':jsonobj['PoweronStatus'], 
-    #                       'alarm':jsonobj['Alarm'], 'time':jsonobj['Time'], 
-    #                       'spindletemp':jsonobj['SpindleTemp'], 'envtemp':jsonobj['EnvTemp'], 
-    #                       'cutflutemp':jsonobj['CutfluTemp'], 'slidertemp':jsonobj['SliderTemp'], 
-    #                       'coordinate':json.dumps(jsonobj['Coordinate'])}
-    jsonobj = {"Cncld":"1",
-             "Xvibration":1.123,
-             "Yvibration":1.123,
-             "Zvibration":1.123,
-             "XvibrationP":1.123,
-             "YvibrationP":1.123,
-             "ZvibrationP":1.123,
-             "Time":"2020-02-19 17:05:14"
-            }
+    # 测试验证
+    jsonobj = {"machineID":"1","vibration1":23.234,"vibration2":23.234,
+             "vibration3":23.234,"vibration4":23.234,"vibration5":23.234,
+             "vibration6":23.234,"Temp1":30.03,"Temp2":30.03,"Temp3":30.03,
+             "Temp4":30.03,"Temp5":30.03,"Temp6":30.03,"Time":"2020-02-20 15:53:14"}
+    
     sqlstr = """
-            insert into MACHINE_VIBRATION (cncid, xvibration, yvibration, 
-                                           zvibration, xvibrationp, yvibrationp,
-                                           zvibrationp, time)
-            values (:cncid, :xvibration, :yvibration, :zvibration, 
-                    :xvibrationp, :yvibrationp, :zvibrationp,
-                    to_date(:time, 'YYYY-MM-DD HH24:MI:SS'))
+            insert into BASIC_OTHER_MACHINE (machine_id, time, vibration1, vibration2,
+                                             vibration3, vibration4, vibration5,
+                                             vibration6, temp1, temp2, temp3, temp4,
+                                             temp5, temp6)
+            values (:machine_id, to_date(:time, 'YYYY-MM-DD HH24:MI:SS'),
+                    :vibration1, :vibration2, :vibration3, :vibration4, 
+                    :vibration5, :vibration6, :temp1, :temp2, :temp3, :temp4,
+                    :temp5, :temp6)
             """
+    parameters = {'machine_id':jsonobj['machineID'], 'time':jsonobj['Time'], 
+                          'vibration1':jsonobj['vibration1'],
+                          'vibration2':jsonobj['vibration2'],
+                          'vibration3':jsonobj['vibration3'], 
+                          'vibration4':jsonobj['vibration4'],
+                          'vibration5':jsonobj['vibration5'],
+                          'vibration6':jsonobj['vibration6'],
+                          'temp1':jsonobj['Temp1'], 'temp2':jsonobj['Temp2'],
+                          'temp3':jsonobj['Temp3'], 'temp4':jsonobj['Temp4'],
+                          'temp5':jsonobj['Temp5'], 'temp6':jsonobj['Temp6'],
+                          }
+    db.insert(sqlstr,parameters)
 
-    parameters = {'cncid':jsonobj['Cncld'], 'xvibration':jsonobj['Xvibration'], 
-                          'yvibration':jsonobj['Yvibration'], 'zvibration':jsonobj['Zvibration'], 
-                          'xvibrationp':jsonobj['XvibrationP'], 'yvibrationp':jsonobj['YvibrationP'],
-                          'zvibrationp':jsonobj['ZvibrationP'],
-                          'time':jsonobj['Time']}
-    db.insert(sqlstr, parameters)
-
-    sql = "SELECT * FROM MACHINE_VIBRATION"
+    sql = "SELECT * FROM BASIC_OTHER_MACHINE"
     res = db.search(sql)
     print(res)
     db.closeconn()
