@@ -6,6 +6,7 @@ import queue
 import json
 import logger
 from cncparsing import CNCParsing
+from kafkaclient import CncKafka
 
 # 全局变量定义需要订阅的主题
 subtopic = []
@@ -19,6 +20,9 @@ queobj = {
 # 定义队列接搜订阅值
 subqueue = queue.Queue()
 
+# 初始化Kafka
+kclient = CncKafka()
+
 #MQTT连接回调函数
 def on_connect(client, userdata, flags, rc):
     logger.writeLog("成功连接MQTT服务器: "+str(rc))
@@ -27,19 +31,24 @@ def on_connect(client, userdata, flags, rc):
 
 #MQTT订阅接收回调函数
 def on_message(client, userdata, msg):
-    # print(msg.topic+" "+str(msg.payload))
+    print(msg.topic+" "+str(msg.payload))
     queobj['topic'] = str(msg.topic)
-    queobj['msg'] = json.loads(str(msg.payload,'utf-8'))
+    queobj['msg'] = str(msg.payload,'utf-8')
+    print("接收到:"+ queobj['msg'])
     subqueue.put(json.dumps(queobj))
 
 
 def dealInfo():
     while 1:
         if not subqueue.empty() :
-            obj =json.loads(subqueue.get())
-            cncparse = CNCParsing(obj['topic'], obj['msg'])
-            cncparse.parse()
-        # time.sleep(0.1)
+            msg = subqueue.get()
+            print(msg)
+            # 存入kafka中
+            kclient.sendmsg(msg)
+            # cncparse = CNCParsing(obj['topic'], obj['msg'])
+            # cncparse.parse()
+        time.sleep(0.1)
+        
 
 if __name__ == "__main__":
     # 读取配置文件
@@ -51,13 +60,13 @@ if __name__ == "__main__":
         mqttserverport = configobj['mqtt']['port']
         mqttkeepalive = configobj['mqtt']['keepalive']
         subtopic = configobj['mqtt']['subtopics']
-        print("即将订阅的主题为：" + subtopic)
+        print("即将订阅的主题为：" + str(subtopic))
         mqttclient = mqtt.Client()
         mqttclient.on_connect = on_connect
         mqttclient.on_message = on_message
         mqttclient.connect(mqttserverurl, mqttserverport, mqttkeepalive)
         
-        # 开启写oracle数据库线程
+        # 开启写Kafka线程
         th = threading.Thread(target=dealInfo)
         th.start()
         while True:

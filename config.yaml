@@ -3,17 +3,25 @@ mqtt:
     port: 1883
     keepalive: 30
     subtopics:
-        - 100/TXST001/ping
-        - 100/TXST001/status
-        - 100/TXST001/x_vibration
-        - 100/TXST001/y_vibration
-        - 100/TXST001/z_vibration
-        - 100/TXST001/spindleTemp
-        - 100/TXST001/envTemp
-        - 100/TXST001/abrPower
+        - Basic
+        - vibration
+        - Abrpower
+        - XAbracceleration
+        - YAbracceleration
+        - ZAbracceleration
+        - XAbrvelocity
+        - YAbrvelocity
+        - ZAbrvelocity
+        - Machineheat
+        - Transferdata
 oracle:
     server: 127.0.0.1
     port: 1521
-    servicename: name
-    user: user
-    password: pass
+    servicename: test
+    user: test
+    password: test
+kafka:
+    server: 127.0.0.1:9092
+    topic: test
+    consumergroup: test01
+    consumerid: test001
