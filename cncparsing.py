@@ -11,6 +11,7 @@ class CNCParsing:
         self.topic = topic
         self.jsonobj = jsonobj
         self.oradb = DatabaseAdapter()
+        self.oradb.oraconnect()
 
     # 根据主题及内容使用不同的方法处理数据
     def parse(self):
@@ -20,7 +21,7 @@ class CNCParsing:
         #机床基础信息
         if self.topic.find('Basic') != -1:
             '''
-            {"Cncld":"1",
+            {"CncId":"1",
              "PingStr":"MDCisliving",
              "RunStatus":"0",
              "PoweronStatus":"0",
@@ -48,18 +49,18 @@ class CNCParsing:
                     :poweronstatus, :alarm, to_date(:time, 'YYYY-MM-DD HH24:MI:SS'), 
                     :spindletemp, :envtemp, :cutflutemp, :slidertemp, :coordinate)
             """
-            parameters = {'cncid':self.jsonobj['Cncld'], 'pingstr':self.jsonobj['PingStr'], 
+            parameters = {'cncid':self.jsonobj['CncId'], 'pingstr':self.jsonobj['PingStr'], 
                           'runstatus':self.jsonobj['RunStatus'], 'poweronstatus':self.jsonobj['PoweronStatus'], 
                           'alarm':self.jsonobj['Alarm'], 'time':self.jsonobj['Time'], 
                           'spindletemp':self.jsonobj['SpindleTemp'], 'envtemp':self.jsonobj['EnvTemp'], 
                           'cutflutemp':self.jsonobj['CutfluTemp'], 'slidertemp':self.jsonobj['SliderTemp'], 
                           'coordinate':json.dumps(self.jsonobj['Coordinate'])}
-            # 插入数据库   
+            # 插入数据库  
             self.oradb.insert(sqlstr, parameters) 
         # 主轴三向震动
         elif self.topic.find('vibration') != -1:
             '''
-            {"Cncld":"1",
+            {"CncId":"1",
              "Xvibration":1.123,
              "Yvibration":1.123,
              "Zvibration":1.123,
@@ -81,7 +82,7 @@ class CNCParsing:
                     :xvibrationp, :yvibrationp, :zvibrationp,
                     to_date(:time, 'YYYY-MM-DD HH24:MI:SS'))
             """
-            parameters = {'cncid':self.jsonobj['Cncld'], 'xvibration':self.jsonobj['Xvibration'], 
+            parameters = {'cncid':self.jsonobj['CncId'], 'xvibration':self.jsonobj['Xvibration'], 
                           'yvibration':self.jsonobj['Yvibration'], 'zvibration':self.jsonobj['Zvibration'], 
                           'xvibrationp':self.jsonobj['XvibrationP'], 'yvibrationp':self.jsonobj['YvibrationP'],
                           'zvibrationp':self.jsonobj['ZvibrationP'],
@@ -258,7 +259,7 @@ class CNCParsing:
         #热机时加速度有效值接口
         # elif self.topic.find('ZAbrvelocity') != -1:
         #     '''
-        #     {"Cncld":"1",
+        #     {"CncId":"1",
         #     "AbrVelocity":{"ToolNo":1,
         #                    "Mszd":23.234,
         #                    "Mssx":34.345,
@@ -269,7 +270,7 @@ class CNCParsing:
         # #热机时加速度有效值接口
         # elif self.topic.find('ZAbrvelocity') != -1:
         #     '''
-        #     {"Cncld":"1",
+        #     {"CncId":"1",
         #     "AbrVelocity":{"ToolNo":1,
         #                    "Mszd":23.234,
         #                    "Mssx":34.345,

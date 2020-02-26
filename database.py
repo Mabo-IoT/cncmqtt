@@ -59,7 +59,7 @@ class DatabaseAdapter:
                 self.conn.commit()
             else:
                 # 可以进行重连尝试，未实现
-                logger.writeLog("Oracle数据库插入失败:" + sqlstr + json.dumps(para))
+                logger.writeLog("Oracle数据库插入失败:" + errstr + sqlstr + json.dumps(para))
         except:
             errstr = traceback.format_exc()
             logger.writeLog("Oracle数据库插入失败:" + errstr + sqlstr + json.dumps(para))

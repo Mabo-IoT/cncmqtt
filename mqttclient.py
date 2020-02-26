@@ -17,7 +17,7 @@ queobj = {
     "msg": None
 }
 
-# 定义队列接搜订阅值
+# 定义队列接收订阅值
 subqueue = queue.Queue()
 
 # 初始化Kafka

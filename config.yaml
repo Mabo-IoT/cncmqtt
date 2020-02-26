@@ -22,6 +22,6 @@ oracle:
     password: test
 kafka:
     server: 127.0.0.1:9092
-    topic: test
-    consumergroup: test01
-    consumerid: test001
+    topic: cncmqtt
+    consumergroup: mqttinfo
+    consumerid: mqttinfo01
