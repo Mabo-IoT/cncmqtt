@@ -16,9 +16,11 @@ if __name__ == "__main__":
         consumer  = kclient.getconsumer()
         for message in consumer:
             if message is not None:
-                print('kafka2ora接收到数据')
                  # 解析并存入Oracle数据
-                resmsg =json.loads(message.value.decode('utf-8'))
+                kmsg = message.value.decode('utf-8')
+                strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+                print(strtime + " :接收到Kafka消费信息-" + kmsg)
+                resmsg =json.loads(kmsg)
                 cncparse = CNCParsing(resmsg['topic'], json.loads(resmsg['msg']))
                 cncparse.parse()
     except:

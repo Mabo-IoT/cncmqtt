@@ -4,6 +4,7 @@ import json
 from pykafka import KafkaClient
 import traceback
 import queue
+import time
 
 
 class CncKafka:
@@ -27,7 +28,8 @@ class CncKafka:
             self.consumerid = configobj['kafka']['consumerid']
             self.connect()
         except:
-            logger.writeLog("读取Kafka数据库配置文件失败!")
+            errstr = traceback.format_exc()
+            logger.writeLog("Kafka客户端实例化失败:" + errstr)
         
     def connect(self):
         '''
@@ -46,22 +48,30 @@ class CncKafka:
         '''
         topic = self.kafkaclient.topics[self.kafkatopic.encode('utf-8')]#选择一个topic
         producer = topic.get_producer(sync=False, delivery_reports=True)
-        print('kafka写入:'+ msg)
+        strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+        print(strtime + ':kafka写入:'+ msg)
         try:
             producer.produce(msg.encode())
         except:
-            logger.writeLog("Kafka发布数据失败"+ msg, "kafka.log")
+            errstr = traceback.format_exc()
+            logger.writeLog("Kafka发布数据失败:"+ errstr + msg, "kafka.log")
 
     def getconsumer(self):
         '''
         返回一个消费者对象
         '''
-        topic = self.kafkaclient.topics[self.kafkatopic.encode('utf-8')]#选择一个topic
-        consumer = topic.get_simple_consumer(consumer_group=b'test_group', 
+        try:
+            topic = self.kafkaclient.topics[self.kafkatopic.encode('utf-8')]#选择一个topic
+            consumer = topic.get_simple_consumer(consumer_group=b'test_group', 
                              auto_commit_enable=True, 
                              auto_commit_interval_ms=1, 
                              consumer_id=b'test_id')
-        return consumer
+            strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+            print(strtime + " :Kafka Consumer初始化成功!")
+            return consumer
+        except:
+            errstr = traceback.format_exc()
+            logger.writeLog("Kafka消费者实例化失败:" + errstr, "kafka.log")
 
 
 

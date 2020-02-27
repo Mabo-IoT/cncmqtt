@@ -25,16 +25,16 @@ kclient = CncKafka()
 
 #MQTT连接回调函数
 def on_connect(client, userdata, flags, rc):
-    logger.writeLog("成功连接MQTT服务器: "+str(rc))
+    logger.writeLog("成功连接MQTT服务器: "+ str(rc))
     for topic in subtopic:
         client.subscribe(topic)
 
 #MQTT订阅接收回调函数
 def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
     queobj['topic'] = str(msg.topic)
     queobj['msg'] = str(msg.payload,'utf-8')
-    print("接收到:"+ queobj['msg'])
+    strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+    print(strtime + "接收到:"+ queobj['msg'])
     subqueue.put(json.dumps(queobj))
 
 
@@ -42,11 +42,8 @@ def dealInfo():
     while 1:
         if not subqueue.empty() :
             msg = subqueue.get()
-            print(msg)
             # 存入kafka中
             kclient.sendmsg(msg)
-            # cncparse = CNCParsing(obj['topic'], obj['msg'])
-            # cncparse.parse()
         time.sleep(0.1)
         
 
@@ -60,7 +57,8 @@ if __name__ == "__main__":
         mqttserverport = configobj['mqtt']['port']
         mqttkeepalive = configobj['mqtt']['keepalive']
         subtopic = configobj['mqtt']['subtopics']
-        print("即将订阅的主题为：" + str(subtopic))
+        strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+        print(strtime + ":订阅的主题为：" + str(subtopic))
         mqttclient = mqtt.Client()
         mqttclient.on_connect = on_connect
         mqttclient.on_message = on_message
