@@ -2,6 +2,8 @@ mqtt:
     server: 127.0.0.1
     port: 1883
     keepalive: 30
+    username: test
+    password: test
     subtopics:
         - Basic
         - vibration
@@ -21,7 +23,7 @@ oracle:
     user: test
     password: test
 kafka:
-    server: 127.0.0.1:9092
+    server: 127.0.0.1:9092,127.0.0.2:9092,127.0.0.3:9092
     topic: cncmqtt
     consumergroup: mqttinfo
     consumerid: mqttinfo01

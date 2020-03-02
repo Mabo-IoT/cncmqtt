@@ -57,9 +57,12 @@ if __name__ == "__main__":
         mqttserverport = configobj['mqtt']['port']
         mqttkeepalive = configobj['mqtt']['keepalive']
         subtopic = configobj['mqtt']['subtopics']
+        username = configobj['mqtt']['username']
+        password = configobj['mqtt']['password']
         strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
         print(strtime + ":订阅的主题为：" + str(subtopic))
         mqttclient = mqtt.Client()
+        mqttclient.username_pw_set(username,password = password)
         mqttclient.on_connect = on_connect
         mqttclient.on_message = on_message
         mqttclient.connect(mqttserverurl, mqttserverport, mqttkeepalive)
