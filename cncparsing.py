@@ -23,7 +23,7 @@ class CNCParsing:
         try:
             #--------------------------机床部分-----------------------------
             #机床基础信息
-            if self.topic.find('Basic') != -1:
+            if self.topic.find('Basic') != -1 and self.topic != 'JxsBasic':
                 '''
                 {"CncId":"1",
                 "PingStr":"MDCisliving",
@@ -62,7 +62,7 @@ class CNCParsing:
                 self.oradb.insert(sqlstr, parameters) 
                 logger.writeLog('机床基础信息写入数据库->' + json.dumps(self.jsonobj), "database.log")
             # 主轴三向震动
-            elif self.topic.find('vibration') != -1:
+            elif self.topic.find('vibration') != -1 and self.topic != 'Jxsvibration':
                 '''
                 {"CncId":"1",
                 "Xvibration":1.123,
@@ -256,28 +256,91 @@ class CNCParsing:
                 logger.writeLog('热机时加速度有效值写入数据库->' + json.dumps(self.jsonobj), "database.log")
         
             #--------------------------机械手部分-----------------
-            #热机时加速度有效值接口
-            # elif self.topic.find('ZAbrvelocity') != -1:
-            #     '''
-            #     {"CncId":"1",
-            #     "AbrVelocity":{"ToolNo":1,
-            #                    "Mszd":23.234,
-            #                    "Mssx":34.345,
-            #                    "Msxx":20.222},
-            #     "Time":"2020-01-22 22:53:14"}
-            #     '''
-            #     logger.writeLog('主轴Z方向速度振动磨损值接口->' + json.dumps(self.jsonobj))
-            # #热机时加速度有效值接口
-            # elif self.topic.find('ZAbrvelocity') != -1:
-            #     '''
-            #     {"CncId":"1",
-            #     "AbrVelocity":{"ToolNo":1,
-            #                    "Mszd":23.234,
-            #                    "Mssx":34.345,
-            #                    "Msxx":20.222},
-            #     "Time":"2020-01-22 22:53:14"}
-            #     '''
-            #     logger.writeLog('主轴Z方向速度振动磨损值接口->' + json.dumps(self.jsonobj)
+            #机械手基础信息
+            elif self.topic.find('JxsBasic') != -1:
+                '''
+                {"CncId":"1","CncNo":"111","PartNo":"222",
+                "Coordinate":{"X":12.123,"Y":23.234,"Z":34.345},
+                "Time":"2020-01-22 22:53:14"}
+                '''
+                # 给部分可选值设置默认值
+                if 'Coordinate' not in self.jsonobj.keys():
+                    self.jsonobj['Coordinate'] = {}
+                #生成插入的sql语句
+                sqlstr = """
+                insert into JXS_BASIC_MACHINE (cncid, cncno, partno, time, coordinate)
+                values (:cncid, :cncno, to_date(:time, 'YYYY-MM-DD HH24:MI:SS'), :coordinate)
+                """
+                parameters = {'cncid':self.jsonobj['CncId'], 'cncno':self.jsonobj['CncNo'],
+                              'partno':self.jsonobj['PartNo'], 'time':self.jsonobj['Time'], 
+                              'coordinate':json.dumps(self.jsonobj['Coordinate'])}
+                # 插入数据库  
+                # self.oradb.insert(sqlstr, parameters)
+                logger.writeLog('机械手基础信息->' + json.dumps(self.jsonobj))
+            
+            #机械手振动接口
+            elif self.topic.find('Jxsvibration') != -1:
+                '''
+               {"CncId":"1","LY+vibrationP":1.123,"LY-vibrationP":1.123,
+                "RY+vibrationP":1.123,"RY-vibrationP":1.123,"LY+vibration":1.123,
+                "LY-vibration":1.123,"RY+vibration":1.123,"RY-vibration":1.123,
+                "Time":"2020-01-22 22:53:14"}
+                '''
+                #给部分可选值设置默认值
+                
+                #生成插入的sql语句
+                sqlstr = """
+                insert into Jxsvibration (cncid, ly+vibrationp, ly-vibrationp,
+                                          ry+vibrationp, ry-vibrationp, ly+vibration, 
+                                          ly-vibration, ry+vibration, ry-vibration, time)
+                values (:cncid, :ly+vibrationp, ::ly-vibrationp, 
+                        :ry+vibrationp, :ry-vibrationp,
+                        :ly+vibration, :ly-vibration, :ry+vibration, :ry-vibration,
+                        to_date(:time, 'YYYY-MM-DD HH24:MI:SS'))
+                """
+                parameters = {'cncid':self.jsonobj['CncId'],
+                              'ly+vibrationp': self.jsonobj['LY+vibrationP'],'ly-vibrationp': self.jsonobj['LY-vibrationP'],
+                              'ry+vibrationp': self.jsonobj['RY+vibrationP'],'ry-vibrationp': self.jsonobj['RY-vibrationP'],
+                              'ly+vibration': self.jsonobj['LY+vibration'],'ly-vibration': self.jsonobj['LY-vibration'],
+                              'ry+vibration': self.jsonobj['RY+vibration'],'ry-vibration': self.jsonobj['RY-vibration'],
+                              'time':self.jsonobj['Time']}
+                # 插入数据库  
+                # self.oradb.insert(sqlstr, parameters)
+                logger.writeLog('机械手震动接口->' + json.dumps(self.jsonobj))
+            
+            #机械手自检上传接口
+            elif self.topic.find('JxsSelftest') != -1:
+                '''
+                {"CncId":"1","XAvePower":1,"Z1AvePower":1,"Z2AvePower":1,
+                 "A1AvePower":1,"A2AvePower":1,"XStdPower":1,"Z1StdPower":1,
+                 "Z2StdPower":1,"A1StdPower":1,"A2StdPower":1,
+                 "Time":"2020-01-22 22:53:14"}
+                '''
+                #生成插入的sql语句
+                sqlstr = """
+                insert into BASIC_MACHINE (cncid, xavepower, z1avepower, z2avepower, 
+                                        a1avepower, a2avepower, xstdpower, z1stdpower, 
+                                        z2stdpower, a1stdpower, a2stdpower, time)
+                values (:cncid, :xavepower, :z1avepower, :z2avepower, 
+                        :a1avepower, :a2avepower, :xstdpower, :z1stdpower, 
+                        :z2stdpower, :a1stdpower, :a2stdpower, 
+                        to_date(:time, 'YYYY-MM-DD HH24:MI:SS'))
+                """
+                parameters = {'cncid':self.jsonobj['CncId'], 
+                              'xavepower':self.jsonobj['XAvePower'],  
+                              'z1avepower':self.jsonobj['Z1AvePower'],
+                              'z2avepower':self.jsonobj['Z2AvePower'],
+                              'a1avepower':self.jsonobj['A1AvePower'],
+                              'a2avepower':self.jsonobj['A2AvePower'],
+                              'xstdpower':self.jsonobj['XStdPower'],
+                              'z1stdpower':self.jsonobj['Z1StdPower'],
+                              'z2stdpower':self.jsonobj['Z2StdPower'],
+                              'a1stdpower':self.jsonobj['A1StdPower'],
+                              'a2stdpower':self.jsonobj['A2StdPower'],
+                              'time':self.jsonobj['Time']}
+                # 插入数据库  
+                # self.oradb.insert(sqlstr, parameters)
+                logger.writeLog('机械手自检接口->' + json.dumps(self.jsonobj))
 
             #--------------------------其他Transfer机床数据上传--------------------------
             elif self.topic.find('Transferdata') != -1:

@@ -47,7 +47,7 @@ class CncKafka:
         作为生产者发送一条数据
         '''
         topic = self.kafkaclient.topics[self.kafkatopic.encode('utf-8')]#选择一个topic
-        producer = topic.get_producer(sync=False, delivery_reports=True)
+        producer = topic.get_producer(sync=False,linger_ms=0)
         strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
         print(strtime + ':kafka写入:'+ msg)
         try:

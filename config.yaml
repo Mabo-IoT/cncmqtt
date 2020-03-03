@@ -16,6 +16,9 @@ mqtt:
         - ZAbrvelocity
         - Machineheat
         - Transferdata
+        - JxsBasic
+        - Jxsvibration
+        - JxsSelftest
 oracle:
     server: 127.0.0.1
     port: 1521

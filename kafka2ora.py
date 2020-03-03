@@ -1,4 +1,4 @@
-import time
+﻿import time
 import yaml
 import queue
 import json
@@ -21,8 +21,13 @@ if __name__ == "__main__":
                 strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
                 print(strtime + " :接收到Kafka消费信息-" + kmsg)
                 resmsg =json.loads(kmsg)
-                cncparse = CNCParsing(resmsg['topic'], json.loads(resmsg['msg']))
-                cncparse.parse()
+                try:
+                	cncparse = CNCParsing(resmsg['topic'], json.loads(resmsg['msg']))
+                	cncparse.parse()
+                except:
+                	errstr = traceback.format_exc()
+                	logger.writeLog("Kafka消费数据写入库错误:" + errstr + kmsg , "kafka2ora.log")
+
     except:
         errstr = traceback.format_exc()
         logger.writeLog("Kafka消费数据写入库错误:" + errstr, "kafka2ora.log")
