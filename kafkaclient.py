@@ -51,7 +51,7 @@ class CncKafka:
         strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
         print(strtime + ':kafka写入:'+ msg)
         try:
-            producer.produce(msg.encode())
+            producer.produce(msg.encode('utf-8'))
         except:
             errstr = traceback.format_exc()
             logger.writeLog("Kafka发布数据失败:"+ errstr + msg, "kafka.log")

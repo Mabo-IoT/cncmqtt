@@ -268,15 +268,16 @@ class CNCParsing:
                     self.jsonobj['Coordinate'] = {}
                 #生成插入的sql语句
                 sqlstr = """
-                insert into JXS_BASIC_MACHINE (cncid, cncno, partno, time, coordinate)
-                values (:cncid, :cncno, to_date(:time, 'YYYY-MM-DD HH24:MI:SS'), :coordinate)
+                insert into BASIC_MACHINE_HAND (cncid, cncno, partno, x_axis, y_axis, z_axis, time)
+                values (:cncid, :cncno, :partno, :x_axis, :y_axis, :z_axis, to_date(:time, 'YYYY-MM-DD HH24:MI:SS'))
                 """
                 parameters = {'cncid':self.jsonobj['CncId'], 'cncno':self.jsonobj['CncNo'],
-                              'partno':self.jsonobj['PartNo'], 'time':self.jsonobj['Time'], 
-                              'coordinate':json.dumps(self.jsonobj['Coordinate'])}
+                              'partno':self.jsonobj['PartNo'], 'x_axis':self.jsonobj['Coordinate']['X'],
+                              'y_axis':self.jsonobj['Coordinate']['Y'],'z_axis':self.jsonobj['Coordinate']['Z'],
+                              'time':self.jsonobj['Time']}
                 # 插入数据库  
-                # self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('机械手基础信息->' + json.dumps(self.jsonobj))
+                self.oradb.insert(sqlstr, parameters)
+                logger.writeLog('机械手基础信息->' + json.dumps(self.jsonobj), "database.log")
             
             #机械手振动接口
             elif self.topic.find('Jxsvibration') != -1:
@@ -290,23 +291,25 @@ class CNCParsing:
                 
                 #生成插入的sql语句
                 sqlstr = """
-                insert into Jxsvibration (cncid, ly+vibrationp, ly-vibrationp,
-                                          ry+vibrationp, ry-vibrationp, ly+vibration, 
-                                          ly-vibration, ry+vibration, ry-vibration, time)
-                values (:cncid, :ly+vibrationp, ::ly-vibrationp, 
-                        :ry+vibrationp, :ry-vibrationp,
-                        :ly+vibration, :ly-vibration, :ry+vibration, :ry-vibration,
+                insert into machine_hand_vibration (cncid, ly_upper_vibrationp, ly_down_vibrationp,
+                                          ry_upper_vibrationp, ry_down_vibrationp, 
+                                          ly_upper_vibration, ly_down_vibration,
+                                          ry_upper_vibration, ry_down_vibration, time)
+                values (:cncid, :ly_upper_vibrationp, :ly_down_vibrationp,
+                        :ry_upper_vibrationp, :ry_down_vibrationp, 
+                        :ly_upper_vibration, :ly_down_vibration,
+                        :ry_upper_vibration, :ry_down_vibration,
                         to_date(:time, 'YYYY-MM-DD HH24:MI:SS'))
                 """
                 parameters = {'cncid':self.jsonobj['CncId'],
-                              'ly+vibrationp': self.jsonobj['LY+vibrationP'],'ly-vibrationp': self.jsonobj['LY-vibrationP'],
-                              'ry+vibrationp': self.jsonobj['RY+vibrationP'],'ry-vibrationp': self.jsonobj['RY-vibrationP'],
-                              'ly+vibration': self.jsonobj['LY+vibration'],'ly-vibration': self.jsonobj['LY-vibration'],
-                              'ry+vibration': self.jsonobj['RY+vibration'],'ry-vibration': self.jsonobj['RY-vibration'],
+                              'ly_upper_vibrationp': self.jsonobj['LY+vibrationP'],'ly_down_vibrationp': self.jsonobj['LY-vibrationP'],
+                              'ry_upper_vibrationp': self.jsonobj['RY+vibrationP'],'ry_down_vibrationp': self.jsonobj['RY-vibrationP'],
+                              'ly_upper_vibration': self.jsonobj['LY+vibration'],'ly_down_vibration': self.jsonobj['LY-vibration'],
+                              'ry_upper_vibration': self.jsonobj['RY+vibration'],'ry_down_vibration': self.jsonobj['RY-vibration'],
                               'time':self.jsonobj['Time']}
                 # 插入数据库  
-                # self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('机械手震动接口->' + json.dumps(self.jsonobj))
+                self.oradb.insert(sqlstr, parameters)
+                logger.writeLog('机械手震动接口->' + json.dumps(self.jsonobj), "database.log")
             
             #机械手自检上传接口
             elif self.topic.find('JxsSelftest') != -1:
@@ -339,8 +342,8 @@ class CNCParsing:
                               'a2stdpower':self.jsonobj['A2StdPower'],
                               'time':self.jsonobj['Time']}
                 # 插入数据库  
-                # self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('机械手自检接口->' + json.dumps(self.jsonobj))
+                self.oradb.insert(sqlstr, parameters)
+                logger.writeLog('机械手自检接口->' + json.dumps(self.jsonobj), "database.log")
 
             #--------------------------其他Transfer机床数据上传--------------------------
             elif self.topic.find('Transferdata') != -1:
