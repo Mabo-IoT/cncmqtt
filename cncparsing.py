@@ -23,7 +23,7 @@ class CNCParsing:
         try:
             #--------------------------机床部分-----------------------------
             #机床基础信息
-            if self.topic.find('Basic') != -1 and self.topic != 'JxsBasic':
+            if self.topic == 'Basic':
                 '''
                 {"CncId":"1",
                 "PingStr":"MDCisliving",
@@ -62,7 +62,7 @@ class CNCParsing:
                 self.oradb.insert(sqlstr, parameters) 
                 logger.writeLog('机床基础信息写入数据库->' + json.dumps(self.jsonobj), "database.log")
             # 主轴三向震动
-            elif self.topic.find('vibration') != -1 and self.topic != 'Jxsvibration':
+            elif self.topic == 'vibration':
                 '''
                 {"CncId":"1",
                 "Xvibration":1.123,
@@ -94,7 +94,7 @@ class CNCParsing:
                 self.oradb.insert(sqlstr, parameters) 
                 logger.writeLog('主轴三向震动写入数据库->' + json.dumps(self.jsonobj), "database.log")
             #刀具功率磨损值
-            elif self.topic.find('Abrpower') != -1: 
+            elif self.topic == 'Abrpower': 
                 '''
                 {"CncId":"1",
                 "AbrPower":{"ToolNo":1,
@@ -122,7 +122,7 @@ class CNCParsing:
                 self.oradb.insert(sqlstr, parameters)
                 logger.writeLog('刀具功率磨损值写入数据库->' + json.dumps(self.jsonobj), "database.log")
             #主轴方向加速度振动磨损值接口
-            elif self.topic.find('Abracceleration') != -1:
+            elif self.topic == 'Abracceleration':
                 '''
                     {"CncId":"1",
                     "AbrAcceleration":{"ToolNo":1,
@@ -164,7 +164,7 @@ class CNCParsing:
                 logger.writeLog('主轴方向加速度振动磨损写入数据库->' + json.dumps(self.jsonobj), "database.log")
 
             #主轴方向速度振动磨损值接口
-            elif self.topic.find('Abrvelocity') != -1:
+            elif self.topic == 'Abrvelocity':
                 '''
                 {"CncId":"1",
                 "AbrVelocity":{"ToolNo":1,
@@ -204,7 +204,7 @@ class CNCParsing:
                 self.oradb.insert(sqlstr, parameters)
                 logger.writeLog('主轴方向速度振动磨损写入数据库->' + json.dumps(self.jsonobj), "database.log")
             #热机时加速度有效值接口
-            elif self.topic.find('Machineheat') != -1:
+            elif self.topic == 'Machineheat':
                 '''
                 {"CncId":"1",
                 "HeatNO":"111",
@@ -257,7 +257,7 @@ class CNCParsing:
         
             #--------------------------机械手部分-----------------
             #机械手基础信息
-            elif self.topic.find('JxsBasic') != -1:
+            elif self.topic == 'JxsBasic':
                 '''
                 {"CncId":"1","CncNo":"111","PartNo":"222",
                 "Coordinate":{"X":12.123,"Y":23.234,"Z":34.345},
@@ -277,10 +277,10 @@ class CNCParsing:
                               'time':self.jsonobj['Time']}
                 # 插入数据库  
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('机械手基础信息->' + json.dumps(self.jsonobj), "database.log")
+                logger.writeLog('机械手基础信息写入数据库->' + json.dumps(self.jsonobj), "database.log")
             
             #机械手振动接口
-            elif self.topic.find('Jxsvibration') != -1:
+            elif self.topic == 'Jxsvibration':
                 '''
                {"CncId":"1","LY+vibrationP":1.123,"LY-vibrationP":1.123,
                 "RY+vibrationP":1.123,"RY-vibrationP":1.123,"LY+vibration":1.123,
@@ -309,10 +309,10 @@ class CNCParsing:
                               'time':self.jsonobj['Time']}
                 # 插入数据库  
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('机械手震动接口->' + json.dumps(self.jsonobj), "database.log")
+                logger.writeLog('机械手震动信息写入数据库->' + json.dumps(self.jsonobj), "database.log")
             
             #机械手自检上传接口
-            elif self.topic.find('JxsSelftest') != -1:
+            elif self.topic == 'JxsSelftest':
                 '''
                 {"CncId":"1","XAvePower":1,"Z1AvePower":1,"Z2AvePower":1,
                  "A1AvePower":1,"A2AvePower":1,"XStdPower":1,"Z1StdPower":1,
@@ -321,7 +321,7 @@ class CNCParsing:
                 '''
                 #生成插入的sql语句
                 sqlstr = """
-                insert into BASIC_MACHINE (cncid, xavepower, z1avepower, z2avepower, 
+                insert into MACHINE_HAND_SELFTEST (cncid, xavepower, z1avepower, z2avepower, 
                                         a1avepower, a2avepower, xstdpower, z1stdpower, 
                                         z2stdpower, a1stdpower, a2stdpower, time)
                 values (:cncid, :xavepower, :z1avepower, :z2avepower, 
@@ -343,10 +343,10 @@ class CNCParsing:
                               'time':self.jsonobj['Time']}
                 # 插入数据库  
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('机械手自检接口->' + json.dumps(self.jsonobj), "database.log")
+                logger.writeLog('机械手自检写入数据库->' + json.dumps(self.jsonobj), "database.log")
 
             #--------------------------其他Transfer机床数据上传--------------------------
-            elif self.topic.find('Transferdata') != -1:
+            elif self.topic == 'Transferdata':
                 '''
                 {"machineID":"1","vibration1":23.234,"vibration2":23.234,
                 "vibration3":23.234,"vibration4":23.234,"vibration5":23.234,
@@ -407,6 +407,6 @@ class CNCParsing:
                 logger.writeLog("传入值异常，未找到匹配项!")
         except:
             errstr = traceback.format_exc()
-            logger.writeLog("CNC字段解析程序失败:" + errstr)
+            logger.writeLog("CNC字段解析程序失败:" + errstr + json.dumps(self.jsonobj))
         
 
