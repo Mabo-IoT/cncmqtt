@@ -44,7 +44,6 @@ def dealInfo():
             msg = subqueue.get()
             # 存入kafka中
             kclient.sendmsg(msg)
-        time.sleep(0.1)
         
 
 if __name__ == "__main__":
@@ -59,6 +58,8 @@ if __name__ == "__main__":
         subtopic = configobj['mqtt']['subtopics']
         username = configobj['mqtt']['username']
         password = configobj['mqtt']['password']
+        # kclient 初始化生产者
+        kclient.getproducer()
         strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
         print(strtime + ":订阅的主题为：" + str(subtopic))
         mqttclient = mqtt.Client()

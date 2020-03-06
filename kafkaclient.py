@@ -13,6 +13,7 @@ class CncKafka:
     consumergroup = None
     consumerid = None
     kafkaclient = None
+    producer = None
 
     def __init__(self):
         '''
@@ -29,7 +30,7 @@ class CncKafka:
             self.connect()
         except:
             errstr = traceback.format_exc()
-            logger.writeLog("Kafka客户端实例化失败:" + errstr)
+            logger.writeLog("Kafka客户端实例化失败:" + errstr, "kafka.log")
         
     def connect(self):
         '''
@@ -37,24 +38,32 @@ class CncKafka:
         '''
         try:
             self.kafkaclient = KafkaClient(hosts = self.kafkahosts)
+            logger.writeLog("成功连接Kafka服务器!","kafka.log")
         except:
             errstr = traceback.format_exc()
             logger.writeLog("Kafka服务器连接错误:" + errstr, "kafka.log")
 
+    def getproducer(self):
+        '''
+        初始化生产者
+        '''
+        topic = self.kafkaclient.topics[self.kafkatopic.encode('utf-8')]#选择一个topic
+        self.producer = topic.get_producer(sync=False,linger_ms=0)
+        logger.writeLog("Kafka Producer初始化成功!", "kafka.log")
+        return self.producer
 
     def sendmsg(self, msg):
         '''
         作为生产者发送一条数据
         '''
-        topic = self.kafkaclient.topics[self.kafkatopic.encode('utf-8')]#选择一个topic
-        producer = topic.get_producer(sync=False,linger_ms=0)
         strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
         print(strtime + ':kafka写入:'+ msg)
         try:
-            producer.produce(msg.encode('utf-8'))
+            self.producer.produce(msg.encode('utf-8'))
         except:
             errstr = traceback.format_exc()
             logger.writeLog("Kafka发布数据失败:"+ errstr + msg, "kafka.log")
+
 
     def getconsumer(self):
         '''
