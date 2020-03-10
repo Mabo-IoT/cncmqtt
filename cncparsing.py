@@ -8,10 +8,8 @@ class CNCParsing:
     jsonobj = None # 内容
     oradb = None #oracle数据库操作对象
 
-    def __init__(self,topic,jsonobj):
+    def __init__(self):
         try:
-            self.topic = topic
-            self.jsonobj = jsonobj
             self.oradb = DatabaseAdapter()
             self.oradb.oraconnect()
         except:
@@ -19,8 +17,10 @@ class CNCParsing:
             logger.writeLog("CNC字段解析程序初始化失败:" + errstr)
 
     # 根据主题及内容使用不同的方法处理数据
-    def parse(self):
+    def parse(self, topic, jsonobj):
         try:
+            self.topic = topic
+            self.jsonobj = jsonobj
             #--------------------------机床部分-----------------------------
             #机床基础信息
             if self.topic == 'Basic':
