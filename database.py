@@ -58,11 +58,17 @@ class DatabaseAdapter:
                 self.cursor.execute(sqlstr, para)
                 self.conn.commit()
             else:
-                # 可以进行重连尝试，未实现
-                logger.writeLog("Oracle数据库插入失败:" + errstr + sqlstr + json.dumps(para))
+                #进行重连
+                logger.writeLog("Oracle数据库尝试重新连接","insertfail.log") 
+                self.oraconnect()
+                if self.cursor:
+                    self.cursor.execute(sqlstr, para)
+                    self.conn.commit()
+                else:
+                    logger.writeLog("Oracle数据库重连插入失败:" + sqlstr + json.dumps(para),"insertfail.log")
         except:
             errstr = traceback.format_exc()
-            logger.writeLog("Oracle数据库插入失败:" + errstr + sqlstr + json.dumps(para))
+            logger.writeLog("Oracle数据库插入失败:" + errstr + sqlstr + json.dumps(para),"insertfail.log")
             
 
     def search(self, sqlstr, para=None):
@@ -95,7 +101,7 @@ class DatabaseAdapter:
 
 if __name__ == "__main__":
     db = DatabaseAdapter()
-    db.oraconnect()
+    # db.oraconnect()
     # 测试验证
     jsonobj = {"machineID":"1","vibration1":23.234,"vibration2":23.234,
              "vibration3":23.234,"vibration4":23.234,"vibration5":23.234,
