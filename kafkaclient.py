@@ -71,10 +71,10 @@ class CncKafka:
         '''
         try:
             topic = self.kafkaclient.topics[self.kafkatopic.encode('utf-8')]#选择一个topic
-            consumer = topic.get_simple_consumer(consumer_group=b'test_group', 
+            consumer = topic.get_simple_consumer(consumer_group=self.consumergroup.encode(), 
                              auto_commit_enable=True, 
                              auto_commit_interval_ms=1, 
-                             consumer_id=b'test_id')
+                             consumer_id=self.consumerid.encode())
             strtime = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
             print(strtime + " :Kafka Consumer初始化成功!")
             return consumer
