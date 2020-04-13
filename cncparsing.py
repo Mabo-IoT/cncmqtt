@@ -17,10 +17,10 @@ class CNCParsing:
             logger.writeLog("CNC字段解析程序初始化失败:" + errstr)
 
     # 根据主题及内容使用不同的方法处理数据
-    def parse(self, topic, jsonobj):
+    def parse(self, topic,jsonobj):
+        self.topic = topic
+        self.jsonobj = jsonobj
         try:
-            self.topic = topic
-            self.jsonobj = jsonobj
             #--------------------------机床部分-----------------------------
             #机床基础信息
             if self.topic == 'Basic':
@@ -59,8 +59,9 @@ class CNCParsing:
                             'cutflutemp':self.jsonobj['CutfluTemp'], 'slidertemp':self.jsonobj['SliderTemp'], 
                             'coordinate':json.dumps(self.jsonobj['Coordinate'])}
                 # 插入数据库  
-                self.oradb.insert(sqlstr, parameters) 
-                logger.writeLog('机床基础信息写入数据库->' + json.dumps(self.jsonobj), "database.log")
+                self.oradb.insert(sqlstr, parameters)
+                # print("机床基础信息写入数据库:" + json.dumps(self.jsonobj))
+                # logger.writeLog('机床基础信息写入数据库->' + json.dumps(self.jsonobj), "database.log")
             # 主轴三向震动
             elif self.topic == 'vibration':
                 '''
@@ -91,8 +92,9 @@ class CNCParsing:
                             'zvibrationp':self.jsonobj['ZvibrationP'],
                             'time':self.jsonobj['Time']}
                 # 插入数据库   
-                self.oradb.insert(sqlstr, parameters) 
-                logger.writeLog('主轴三向震动写入数据库->' + json.dumps(self.jsonobj), "database.log")
+                self.oradb.insert(sqlstr, parameters)
+                # print("主轴三向震动写入数据库:" + json.dumps(self.jsonobj)) 
+                # logger.writeLog('主轴三向震动写入数据库->' + json.dumps(self.jsonobj), "database.log")
             #刀具功率磨损值
             elif self.topic == 'Abrpower': 
                 '''
@@ -120,7 +122,8 @@ class CNCParsing:
                             'msxx':self.jsonobj['AbrPower']['Msxx']}
                 # 插入数据库
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('刀具功率磨损值写入数据库->' + json.dumps(self.jsonobj), "database.log")
+                # print("刀具功率磨损值写入数据库:" + json.dumps(self.jsonobj))
+                # logger.writeLog('刀具功率磨损值写入数据库->' + json.dumps(self.jsonobj), "database.log")
             #主轴方向加速度振动磨损值接口
             elif self.topic == 'Abracceleration':
                 '''
@@ -161,7 +164,8 @@ class CNCParsing:
                             'msxx':self.jsonobj['AbrAcceleration']['Msxx']}
                 # 插入数据库
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('主轴方向加速度振动磨损写入数据库->' + json.dumps(self.jsonobj), "database.log")
+                # print("主轴方向加速度振动磨损写入数据库:" + json.dumps(self.jsonobj))
+                # logger.writeLog('主轴方向加速度振动磨损写入数据库->' + json.dumps(self.jsonobj), "database.log")
 
             #主轴方向速度振动磨损值接口
             elif self.topic == 'Abrvelocity':
@@ -202,7 +206,8 @@ class CNCParsing:
                             'msxx':self.jsonobj['AbrVelocity']['Msxx']}
                 # 插入数据库
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('主轴方向速度振动磨损写入数据库->' + json.dumps(self.jsonobj), "database.log")
+                # print("主轴方向速度振动磨损写入数据库:" + json.dumps(self.jsonobj))
+                # logger.writeLog('主轴方向速度振动磨损写入数据库->' + json.dumps(self.jsonobj), "database.log")
             #热机时加速度有效值接口
             elif self.topic == 'Machineheat':
                 '''
@@ -253,7 +258,8 @@ class CNCParsing:
                             'ysyvelocityrms':self.jsonobj['YSYVelocityRMS']}
                 # 插入数据库
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('热机时加速度有效值写入数据库->' + json.dumps(self.jsonobj), "database.log")
+                # print("热机时加速度有效值写入数据库:" + json.dumps(self.jsonobj))
+                # logger.writeLog('热机时加速度有效值写入数据库->' + json.dumps(self.jsonobj), "database.log")
         
             #--------------------------机械手部分-----------------
             #机械手基础信息
@@ -277,7 +283,8 @@ class CNCParsing:
                               'time':self.jsonobj['Time']}
                 # 插入数据库  
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('机械手基础信息写入数据库->' + json.dumps(self.jsonobj), "database.log")
+                # print("机械手基础信息写入数据库:" + json.dumps(self.jsonobj))
+                # logger.writeLog('机械手基础信息写入数据库->' + json.dumps(self.jsonobj), "database.log")
             
             #机械手振动接口
             elif self.topic == 'Jxsvibration':
@@ -309,7 +316,8 @@ class CNCParsing:
                               'time':self.jsonobj['Time']}
                 # 插入数据库  
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('机械手震动信息写入数据库->' + json.dumps(self.jsonobj), "database.log")
+                # print("机械手震动信息写入数据库:" + json.dumps(self.jsonobj))
+                # logger.writeLog('机械手震动信息写入数据库->' + json.dumps(self.jsonobj), "database.log")
             
             #机械手自检上传接口
             elif self.topic == 'JxsSelftest':
@@ -343,7 +351,8 @@ class CNCParsing:
                               'time':self.jsonobj['Time']}
                 # 插入数据库  
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('机械手自检写入数据库->' + json.dumps(self.jsonobj), "database.log")
+                # print("机械手自检写入数据库:" + json.dumps(self.jsonobj))
+                # logger.writeLog('机械手自检写入数据库->' + json.dumps(self.jsonobj), "database.log")
 
             #--------------------------其他Transfer机床数据上传--------------------------
             elif self.topic == 'Transferdata':
@@ -402,7 +411,8 @@ class CNCParsing:
                             }
                 # 插入数据库
                 self.oradb.insert(sqlstr, parameters)
-                logger.writeLog('其他Transfer机床数据写入数据库->' + json.dumps(self.jsonobj), "database.log")
+                # print("其他Transfer机床数据写入数据库:" + json.dumps(self.jsonobj))
+                # logger.writeLog('其他Transfer机床数据写入数据库->' + json.dumps(self.jsonobj), "database.log")
             else:
                 logger.writeLog("传入值异常，未找到匹配项!")
         except:
