@@ -29,7 +29,7 @@ class DatabaseAdapter:
             self.orauser = configobj['oracle']['user']
             self.orapassword = configobj['oracle']['password']
         except:
-            logger.writeLog("读取数据库配置文件失败!")
+            logger.writeLog("读取数据库配置文件失败!","database.log")
     
     def oraconnect(self):
         '''
@@ -42,7 +42,7 @@ class DatabaseAdapter:
             return self.conn,self.cursor
         except:
             errstr = traceback.format_exc()
-            logger.writeLog("Oracle数据库连接错误:" + errstr)
+            logger.writeLog("Oracle数据库连接错误:" + errstr,"database.log")
 
     def insert(self, sqlstr, para):
         '''
@@ -59,16 +59,16 @@ class DatabaseAdapter:
                 self.conn.commit()
             else:
                 #进行重连
-                logger.writeLog("Oracle数据库尝试重新连接","insertfail.log") 
+                logger.writeLog("Oracle数据库尝试重新连接","database.log") 
                 self.oraconnect()
                 if self.cursor:
                     self.cursor.execute(sqlstr, para)
                     self.conn.commit()
                 else:
-                    logger.writeLog("Oracle数据库重连插入失败:" + sqlstr + json.dumps(para),"insertfail.log")
+                    logger.writeLog("Oracle数据库重连插入失败:" + sqlstr + json.dumps(para),"database.log")
         except:
             errstr = traceback.format_exc()
-            logger.writeLog("Oracle数据库插入失败:" + errstr + sqlstr + json.dumps(para),"insertfail.log")
+            logger.writeLog("Oracle数据库插入失败:" + errstr + sqlstr + json.dumps(para),"database.log")
             
 
     def search(self, sqlstr, para=None):
@@ -83,7 +83,7 @@ class DatabaseAdapter:
             rows = self.cursor.fetchall()
             return rows
         except:
-            logger.writeLog("Oracle数据库查询失败:" + sqlstr)
+            logger.writeLog("Oracle数据库查询失败:" + sqlstr,"database.log")
             return False
 
     def closeconn(self):
@@ -95,13 +95,13 @@ class DatabaseAdapter:
             self.conn.close()
         except:
             errstr = traceback.format_exc()
-            logger.writeLog("Oracle数据库连接关闭错误:" + errstr)
+            logger.writeLog("Oracle数据库连接关闭错误:" + errstr,"database.log")
 
 
 
 if __name__ == "__main__":
     db = DatabaseAdapter()
-    # db.oraconnect()
+    db.oraconnect()
     # 测试验证
     jsonobj = {"machineID":"1","vibration1":23.234,"vibration2":23.234,
              "vibration3":23.234,"vibration4":23.234,"vibration5":23.234,
